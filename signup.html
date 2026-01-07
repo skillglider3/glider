@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup</title>
+</head>
+<body>
+
+<h2>Signup</h2>
+
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+
+<p id="msg"></p>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+  const supabase = createClient(
+    "https://YOUR_PROJECT_ID.supabase.co",
+    "YOUR_ANON_KEY"
+  );
+
+  async function signup() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      document.getElementById("msg").innerText = error.message;
+      return;
+    }
+
+    // Insert into profiles table
+    await supabase.from("profiles").insert({
+      id: data.user.id,
+      email: email,
+    });
+
+    window.location.href = "/login.html";
+  }
+
+  window.signup = signup;
+</script>
+
+</body>
+</html>
